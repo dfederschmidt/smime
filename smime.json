@@ -18,18 +18,15 @@
     "app_version": "1.0.4",
     "utctime_updated": "2022-01-07T20:05:21.000000Z",
     "package_name": "phantom_smime",
-    "main_module": "smime_connector.pyc",
+    "python_version": "3",
+    "main_module": "smime_connector.py",
     "min_phantom_version": "4.8.24304",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
             {
                 "module": "M2Crypto",
-                "input_file": "wheels/M2Crypto-0.35.2-cp27-cp27mu-linux_x86_64.whl"
-            },
-            {
-                "module": "typing",
-                "input_file": "wheels/typing-3.7.4.1-py2-none-any.whl"
+                "input_file": "wheels/M2Crypto-0.38.0-cp39-cp39-linux_x86_64.whl"
             }
         ]
     },

@@ -26,7 +26,6 @@ import json
 import os
 import sys
 from M2Crypto import BIO, Rand, SMIME, X509
-from bs4 import UnicodeDammit
 
 
 class RetVal(tuple):
@@ -54,12 +53,6 @@ class SmimeConnector(BaseConnector):
         :param input_str: Input string to be processed
         :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
         """
-        try:
-            if input_str and self._python_version == 2:
-                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except:
-            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
-
         return input_str
 
     def _get_error_message_from_exception(self, e):
@@ -128,9 +121,9 @@ class SmimeConnector(BaseConnector):
         # Required values can be accessed directly
         # message_body = bytes(str(param['message_body']).encode("utf-8"))
         try:
-            message_body = bytes(self._handle_py_ver_compat_for_input_str(param['message_body']))
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Please verify the value of 'message_body' action parameter")
+            message_body = self._handle_py_ver_compat_for_input_str(param['message_body']).encode()
+        except Exception as err:
+            return action_result.set_status(phantom.APP_ERROR, f"Please verify the value of 'message_body' action parameter: {str(err)}")
 
         # Optional values should use the .get() function
         # vault_id = param.get('vault_id', '')
@@ -189,9 +182,9 @@ class SmimeConnector(BaseConnector):
         # Required values can be accessed directly
         # message_body = bytes(str(param['message_body']).encode("utf-8"))
         try:
-            message_body = bytes(self._handle_py_ver_compat_for_input_str(param['message_body']))
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Please verify the value of 'message_body' action parameter")
+            message_body = self._handle_py_ver_compat_for_input_str(param['message_body']).encode()
+        except Exception as err:
+            return action_result.set_status(phantom.APP_ERROR, f"Please verify the value of 'message_body' action parameter: {str(err)}")
 
         self.save_progress(SMIME_ENCRYPT_PROGRESS_MSG)
         try:
@@ -255,12 +248,8 @@ class SmimeConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-        # Required values can be accessed directly
-        # encrypted_message = bytes(
-        #     str(param['encrypted_message']).encode("utf-8"))
         try:
-            encrypted_message = bytes(self._handle_py_ver_compat_for_input_str(param['encrypted_message']))
+            encrypted_message = self._handle_py_ver_compat_for_input_str(param['encrypted_message']).encode()
         except:
             return action_result.set_status(phantom.APP_ERROR, "Please verify the value of 'encrypted_message' action parameter")
 
@@ -282,8 +271,8 @@ class SmimeConnector(BaseConnector):
         # Load the data, verify it.
         try:
             # Load private key and cert.
-            s.load_key_bio(BIO.MemoryBuffer(self._keys['private']),
-                           BIO.MemoryBuffer(self._keys['public']))
+            s.load_key_bio(BIO.MemoryBuffer(self._keys['private'].encode()),
+                           BIO.MemoryBuffer(self._keys['public'].encode()))
 
             # Load the signed/encrypted data.
             p7, data = SMIME.smime_load_pkcs7_bio(buf)
@@ -331,7 +320,7 @@ class SmimeConnector(BaseConnector):
         # Required values can be accessed directly
         # signed_message = bytes(str(param['signed_message']).encode("utf-8"))
         try:
-            signed_message = bytes(self._handle_py_ver_compat_for_input_str(param['signed_message']))
+            signed_message = self._handle_py_ver_compat_for_input_str(param['signed_message']).encode()
         except:
             return action_result.set_status(phantom.APP_ERROR, "Please verify the value of 'signed_message' action parameter")
 
