@@ -103,8 +103,8 @@ class SmimeConnector(BaseConnector):
 
         # Instantiate an SMIME object; set it up; sign the buffer.
         s = SMIME.SMIME()
-        s.load_key_bio(BIO.MemoryBuffer(self._keys['private']),
-                       BIO.MemoryBuffer(self._keys['public']))
+        s.load_key_bio(BIO.MemoryBuffer(self._keys['private'].encode()),
+                       BIO.MemoryBuffer(self._keys['public'].encode()))
         return s, s.sign(buf, SMIME.PKCS7_DETACHED)
 
     def _handle_sign_email(self, param):
